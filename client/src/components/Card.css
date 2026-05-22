@@ -1,0 +1,88 @@
+.playing-card {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.4);
+  user-select: none;
+  transition: transform 0.2s;
+}
+
+.card-normal {
+  width: 58px;
+  height: 82px;
+}
+
+.card-small {
+  width: 40px;
+  height: 56px;
+}
+
+.playing-card.red {
+  color: #d32f2f;
+}
+
+.playing-card.black {
+  color: #212121;
+}
+
+.card-back {
+  background: linear-gradient(135deg, #1565c0, #0d47a1);
+  border: 2px solid #fff;
+}
+
+.card-back::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.card-corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.card-corner.top-left {
+  top: 4px;
+  left: 5px;
+}
+
+.card-corner.bottom-right {
+  bottom: 4px;
+  right: 5px;
+  transform: rotate(180deg);
+}
+
+.card-rank {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.card-small .card-rank {
+  font-size: 10px;
+}
+
+.card-suit-symbol {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.card-small .card-suit-symbol {
+  font-size: 8px;
+}
+
+.card-center {
+  font-size: 26px;
+}
+
+.card-small .card-center {
+  font-size: 18px;
+}
