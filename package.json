@@ -9,9 +9,11 @@
     "build": "npm run build -w client",
     "start": "NODE_ENV=production tsx server/src/index.ts"
   },
+  "dependencies": {
+    "tsx": "^4.19.2"
+  },
   "devDependencies": {
     "concurrently": "^9.1.2",
-    "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   }
 }

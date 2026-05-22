@@ -24,15 +24,10 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
 if (isProd) {
   const publicDir = path.join(__dirname, '..', 'public');
-  console.log(`Serving static files from: ${publicDir}`);
-  console.log(`__dirname: ${__dirname}`);
-  console.log(`CWD: ${process.cwd()}`);
   app.use(express.static(publicDir));
   app.get('*', (_req, res) => {
     res.sendFile(path.join(publicDir, 'index.html'));
   });
-} else {
-  console.log(`Not in production mode (NODE_ENV=${process.env.NODE_ENV})`);
 }
 
 const PORT = process.env.PORT || 3001;
