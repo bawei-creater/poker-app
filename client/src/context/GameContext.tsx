@@ -1,7 +1,16 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import type { RoomState, HandResult, ChatMessage, GameAction, GamePhase } from 'shared';
 import { socket } from '../socket';
-import { playDeal, playReveal, playYourTurn, playWin, playActionSound } from '../utils/sounds';
+import {
+  playActionSound,
+  playDeal,
+  playPhaseVoice,
+  playRemoteActionVoice,
+  playReveal,
+  playTurnVoice,
+  playWin,
+  playYourTurn,
+} from '../utils/sounds';
 
 interface GameState {
   connected: boolean;
@@ -84,6 +93,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(gameReducer, initialState);
   const prevPhaseRef = useRef<GamePhase>('waiting');
   const prevPlayerRef = useRef<string | null>(null);
+  const prevActionRef = useRef<string | null>(null);
 
   useEffect(() => {
     socket.connect();
@@ -92,6 +102,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     socket.on('disconnect', () => dispatch({ type: 'DISCONNECTED' }));
 
     socket.on('room:created', ({ roomId }) => {
+      dispatch({ type: 'ROOM_JOINED', roomId });
+    });
+
+    socket.on('room:joined', ({ roomId }) => {
       dispatch({ type: 'ROOM_JOINED', roomId });
     });
 
@@ -111,6 +125,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         } else if (roomState.phase !== 'waiting' && roomState.phase !== 'showdown') {
           playReveal();
         }
+        playPhaseVoice(roomState.phase);
         prevPhaseRef.current = roomState.phase;
       }
 
@@ -118,8 +133,20 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       if (roomState.currentPlayerId !== prevPlayer) {
         if (roomState.currentPlayerId === socket.id) {
           playYourTurn();
+          playTurnVoice();
         }
         prevPlayerRef.current = roomState.currentPlayerId;
+      }
+
+      if (roomState.lastAction) {
+        const actionKey = `${roomState.lastAction.playerId}:${roomState.lastAction.type}:${roomState.lastAction.amount ?? ''}`;
+        if (actionKey !== prevActionRef.current) {
+          prevActionRef.current = actionKey;
+          if (roomState.lastAction.playerId !== socket.id) {
+            const playerName = roomState.players.find(p => p.id === roomState.lastAction?.playerId)?.name ?? '玩家';
+            playRemoteActionVoice(playerName, roomState.lastAction.type, roomState.lastAction.amount);
+          }
+        }
       }
 
       dispatch({ type: 'STATE_UPDATE', state: roomState });
@@ -173,7 +200,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const performAction = useCallback((type: GameAction['type'], amount?: number) => {
-    playActionSound(type);
+    playActionSound(type, amount);
     socket.emit('game:action', { type, amount });
   }, []);
 

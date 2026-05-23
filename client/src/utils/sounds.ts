@@ -1,8 +1,90 @@
 let audioCtx: AudioContext | null = null;
+let lastVoiceAt = 0;
+let voiceEnabled = false;
+let speechVoices: SpeechSynthesisVoice[] = [];
+const activeUtterances = new Set<SpeechSynthesisUtterance>();
 
 function getCtx(): AudioContext {
   if (!audioCtx) audioCtx = new AudioContext();
   return audioCtx;
+}
+
+function loadVoices() {
+  if (!('speechSynthesis' in window)) return;
+  speechVoices = window.speechSynthesis.getVoices();
+}
+
+function getChineseVoice() {
+  loadVoices();
+  return (
+    speechVoices.find(v => v.lang.toLowerCase() === 'zh-cn') ??
+    speechVoices.find(v => v.lang.toLowerCase().startsWith('zh')) ??
+    speechVoices.find(v => /xiaoxiao|huihui|yaoyao|yunxi|mandarin|chinese|中文|普通话/i.test(v.name)) ??
+    null
+  );
+}
+
+export function getVoiceStatus() {
+  if (!('speechSynthesis' in window)) {
+    return { supported: false, hasChineseVoice: false, message: '当前浏览器不支持语音播报' };
+  }
+
+  const voice = getChineseVoice();
+  return {
+    supported: true,
+    hasChineseVoice: Boolean(voice),
+    message: voice ? `语音已开启：${voice.name}` : '语音已开启，但系统没有中文语音包',
+  };
+}
+
+export function enableVoice() {
+  voiceEnabled = true;
+  loadVoices();
+  window.speechSynthesis?.resume();
+}
+
+export function testVoice() {
+  enableVoice();
+  const status = getVoiceStatus();
+  speakChinese('语音已开启', true);
+  return status;
+}
+
+function speakChinese(text: string, force = false): boolean {
+  if (!voiceEnabled || !('speechSynthesis' in window)) return false;
+
+  const now = Date.now();
+  if (!force && now - lastVoiceAt < 260) return false;
+  lastVoiceAt = now;
+
+  loadVoices();
+  if (speechVoices.length === 0) {
+    window.setTimeout(() => speakChinese(text, true), 350);
+    return true;
+  }
+
+  const voice = getChineseVoice();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'zh-CN';
+  utterance.voice = voice;
+  utterance.rate = 0.95;
+  utterance.pitch = 1;
+  utterance.volume = 0.9;
+  utterance.onend = () => activeUtterances.delete(utterance);
+  utterance.onerror = () => activeUtterances.delete(utterance);
+  activeUtterances.add(utterance);
+
+  window.speechSynthesis.resume();
+  if (force) window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+  return true;
+}
+
+if ('speechSynthesis' in window) {
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  window.addEventListener('pointerdown', enableVoice, { once: true });
+  window.addEventListener('touchend', enableVoice, { once: true });
 }
 
 // 发牌：短促清脆的"啪"
@@ -144,13 +226,72 @@ export function playReveal() {
 }
 
 // 根据动作类型播放对应音效
-export function playActionSound(action: string) {
+export function playActionSound(action: string, amount?: number) {
   switch (action) {
-    case 'fold': playFold(); break;
-    case 'check': playCheck(); break;
-    case 'call': playChip(); break;
-    case 'raise': playRaise(); break;
-    case 'all-in': playAllIn(); break;
+    case 'fold':
+      playFold();
+      speakChinese('弃牌');
+      break;
+    case 'check':
+      playCheck();
+      speakChinese('过牌');
+      break;
+    case 'call':
+      playChip();
+      speakChinese(amount ? `跟注 ${amount}` : '跟注');
+      break;
+    case 'raise':
+      playRaise();
+      speakChinese(amount ? `加注到 ${amount}` : '加注');
+      break;
+    case 'all-in':
+      playAllIn();
+      speakChinese(amount ? `全下 ${amount}` : '全下');
+      break;
     default: playChip();
+  }
+}
+
+export function playTurnVoice() {
+  speakChinese('轮到你操作');
+}
+
+export function playPhaseVoice(phase: string) {
+  switch (phase) {
+    case 'preflop':
+      speakChinese('开始发牌');
+      break;
+    case 'flop':
+      speakChinese('翻牌');
+      break;
+    case 'turn':
+      speakChinese('转牌');
+      break;
+    case 'river':
+      speakChinese('河牌');
+      break;
+    case 'showdown':
+      speakChinese('开牌');
+      break;
+  }
+}
+
+export function playRemoteActionVoice(playerName: string, action: string, amount?: number) {
+  switch (action) {
+    case 'fold':
+      speakChinese(`${playerName} 弃牌`);
+      break;
+    case 'check':
+      speakChinese(`${playerName} 过牌`);
+      break;
+    case 'call':
+      speakChinese(amount ? `${playerName} 跟注 ${amount}` : `${playerName} 跟注`);
+      break;
+    case 'raise':
+      speakChinese(amount ? `${playerName} 加注到 ${amount}` : `${playerName} 加注`);
+      break;
+    case 'all-in':
+      speakChinese(amount ? `${playerName} 全下 ${amount}` : `${playerName} 全下`);
+      break;
   }
 }

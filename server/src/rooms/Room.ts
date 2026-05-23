@@ -103,7 +103,7 @@ export class Room {
       smallBlind: this.smallBlind,
       bigBlind: this.bigBlind,
       minRaise: this.game?.getMinRaise() ?? 0,
-      lastAction: null,
+      lastAction: this.game?.getLastAction() ?? null,
     };
   }
 

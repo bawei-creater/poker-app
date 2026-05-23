@@ -4,6 +4,14 @@ import { ActionBar } from '../components/ActionBar';
 import { HandResultModal } from '../components/HandResultModal';
 import { ChatBox } from '../components/ChatBox';
 import { socket } from '../socket';
+import { testVoice } from '../utils/sounds';
+
+function handleVoiceTest() {
+  const status = testVoice();
+  if (!status.supported || !status.hasChineseVoice) {
+    alert(status.message);
+  }
+}
 
 export function GameRoom() {
   const { state, leaveRoom, startGame, readyForNext, performAction, sendMessage, clearHandResult } = useGame();
@@ -43,6 +51,7 @@ export function GameRoom() {
           </span>
         </div>
         <div className="header-actions">
+          <button className="btn-voice" onClick={handleVoiceTest}>语音</button>
           {canStart && (
             <button className="btn-start" onClick={startGame}>
               开始游戏

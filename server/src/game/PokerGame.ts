@@ -17,6 +17,7 @@ export class PokerGame {
   private players: Player[];
   private currentBet: number = 0;
   private lastHandResult: HandResult | null = null;
+  private lastAction: GameAction | null = null;
   // Tracks which players still need to act this betting round
   private playersToAct: Set<string> = new Set();
 
@@ -35,6 +36,7 @@ export class PokerGame {
     this.minRaise = this.bigBlind;
     this.currentBet = 0;
     this.lastHandResult = null;
+    this.lastAction = null;
     this.playersToAct = new Set();
 
     for (const p of this.players) {
@@ -80,6 +82,9 @@ export class PokerGame {
     if (!player) throw new Error('玩家不存在');
     if (this.currentPlayerIndex < 0 || this.players[this.currentPlayerIndex]?.id !== playerId) {
       throw new Error('还没轮到你');
+    }
+    if (this.mustRespondToAllIn(player) && action.type !== 'fold' && action.type !== 'all-in') {
+      throw new Error('有人全下后，只能选择全下或弃牌');
     }
 
     switch (action.type) {
@@ -135,6 +140,12 @@ export class PokerGame {
       }
     }
 
+    this.lastAction = {
+      playerId,
+      type: action.type,
+      amount: action.type === 'all-in' ? player.totalBet : action.amount,
+    };
+
     // Remove current player from "needs to act" set
     this.playersToAct.delete(playerId);
 
@@ -149,6 +160,10 @@ export class PokerGame {
   private isBettingRoundComplete(): boolean {
     const active = this.activeInHand();
     if (active.length <= 1) return true;
+
+    if (this.hasAnyAllIn()) {
+      return active.every(p => p.isAllIn || p.folded);
+    }
 
     const activeNonAllIn = active.filter(p => !p.isAllIn);
     if (activeNonAllIn.length <= 1) return true;
@@ -269,7 +284,13 @@ export class PokerGame {
       p.totalProfit += p.profit;
     }
 
-    this.lastHandResult = { winners, pot: this.pot, finalHands, playerProfits };
+    this.lastHandResult = {
+      winners,
+      pot: this.pot,
+      communityCards: [...this.communityCards],
+      finalHands,
+      playerProfits,
+    };
   }
 
   private awardPotToWinner(winner: Player): void {
@@ -290,6 +311,7 @@ export class PokerGame {
     this.lastHandResult = {
       winners: [{ playerId: winner.id, handName: '赢（其他人弃牌）', winnings: this.pot }],
       pot: this.pot,
+      communityCards: [...this.communityCards],
       finalHands: [],
       playerProfits,
     };
@@ -314,6 +336,7 @@ export class PokerGame {
     this.lastHandResult = {
       winners: [{ playerId: winner.id, handName: '赢（其他人离开）', winnings: this.pot }],
       pot: this.pot,
+      communityCards: [...this.communityCards],
       finalHands: [],
       playerProfits,
     };
@@ -411,6 +434,14 @@ export class PokerGame {
     return this.players.filter(p => p.isActive && !p.folded);
   }
 
+  private hasAnyAllIn(): boolean {
+    return this.players.some(p => p.isActive && !p.folded && p.isAllIn);
+  }
+
+  private mustRespondToAllIn(player: Player): boolean {
+    return this.hasAnyAllIn() && !player.isAllIn && !player.folded;
+  }
+
   // Getters
   getPhase(): GamePhase { return this.phase; }
   getCommunityCards(): Card[] { return [...this.communityCards]; }
@@ -422,4 +453,5 @@ export class PokerGame {
   getMinRaise(): number { return this.currentBet + 1; }
   getCurrentBet(): number { return this.currentBet; }
   getLastHandResult(): HandResult | null { return this.lastHandResult; }
+  getLastAction(): GameAction | null { return this.lastAction; }
 }

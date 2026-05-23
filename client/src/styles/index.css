@@ -9,6 +9,7 @@ body {
   background: #0a0a1a;
   color: #fff;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Lobby */
@@ -190,6 +191,7 @@ body {
 .game-room {
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -251,6 +253,16 @@ body {
 .btn-leave:hover {
   border-color: #ff6b6b;
   color: #ff6b6b;
+}
+
+.btn-voice {
+  border-color: #ffd700 !important;
+  color: #ffd700 !important;
+}
+
+.btn-voice:hover {
+  background: #ffd700 !important;
+  color: #000 !important;
 }
 
 .room-name {
@@ -692,6 +704,8 @@ body {
   padding: 32px;
   min-width: 320px;
   max-width: 420px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
 }
 
 .modal-content h2 {
@@ -756,6 +770,48 @@ body {
   padding: 4px 0;
   font-size: 13px;
   color: #aaa;
+}
+
+.final-hand-row {
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.final-hand-info {
+  min-width: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.final-hand-name {
+  color: #ddd;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.final-hand-type {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.final-hand-cards {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.community-result {
+  text-align: center;
+}
+
+.community-result-cards {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .modal-content .btn-primary {
@@ -991,4 +1047,326 @@ body {
   font-weight: bold;
   color: #ffd700;
   animation: fadeIn 0.5s;
+}
+
+@media (max-width: 700px) {
+  .lobby {
+    align-items: flex-start;
+    padding: 18px 12px;
+    min-height: 100dvh;
+  }
+
+  .lobby-container {
+    width: 100%;
+    max-width: 440px;
+    padding: 24px 18px;
+    border-radius: 12px;
+  }
+
+  .lobby-title {
+    font-size: 1.8rem;
+  }
+
+  .lobby-subtitle {
+    margin-bottom: 22px;
+  }
+
+  .room-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 10px;
+  }
+
+  .room-item .btn-join {
+    grid-column: 1 / -1;
+    min-height: 38px;
+  }
+
+  .game-room {
+    min-width: 320px;
+  }
+
+  .game-header {
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .game-header .room-info {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .room-name {
+    display: inline-block;
+    max-width: 108px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+    white-space: nowrap;
+  }
+
+  .header-actions {
+    flex-shrink: 0;
+    gap: 6px;
+  }
+
+  .game-header button {
+    min-height: 34px;
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  .player-stats-bar {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 5px 10px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+
+  .player-stats-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .player-stat {
+    flex: 0 0 auto;
+    font-size: 12px;
+  }
+
+  .poker-table-container {
+    flex: 1 1 auto;
+    min-height: 310px;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .table-surface {
+    width: min(96vw, 520px);
+    height: min(57vw, 300px);
+    min-height: 250px;
+    border-width: 8px;
+  }
+
+  .player-seat {
+    width: 74px;
+  }
+
+  .player-seat.active::after {
+    inset: -5px;
+    border-radius: 10px;
+  }
+
+  .player-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+
+  .empty-avatar {
+    font-size: 18px;
+  }
+
+  .player-name {
+    max-width: 72px;
+    font-size: 10px;
+  }
+
+  .hole-cards {
+    gap: 1px;
+    margin-top: 3px;
+  }
+
+  .player-bet-chip {
+    bottom: -22px;
+  }
+
+  .dealer-chip {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+
+  .folded-label {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+
+  .allin-label {
+    bottom: -34px;
+    padding: 2px 7px;
+    font-size: 10px;
+  }
+
+  .community-cards {
+    gap: 6px;
+  }
+
+  .community-cards-row {
+    gap: 3px;
+  }
+
+  .card-placeholder {
+    width: 38px;
+    height: 54px;
+    border-radius: 6px;
+  }
+
+  .phase-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .pot-display {
+    top: 23%;
+  }
+
+  .pot-label {
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+
+  .pot-amount {
+    font-size: 18px;
+  }
+
+  .action-bar {
+    order: 5;
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 8px;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    flex-wrap: wrap;
+  }
+
+  .action-waiting {
+    width: 100%;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  .btn-action {
+    flex: 1 1 86px;
+    min-height: 42px;
+    padding: 9px 10px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .raise-group {
+    order: 2;
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 6px;
+  }
+
+  .raise-label {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .raise-input-wrap {
+    min-width: 0;
+  }
+
+  .raise-step-btn {
+    min-width: 30px;
+    padding: 9px 5px;
+  }
+
+  .raise-input {
+    width: 42px;
+    font-size: 16px;
+  }
+
+  .chat-box {
+    position: static;
+    order: 4;
+    width: calc(100% - 20px);
+    max-height: 118px;
+    flex: 0 0 auto;
+    opacity: 0.9;
+    margin: 0 10px 6px;
+    border-radius: 8px;
+  }
+
+  .chat-messages {
+    max-height: 76px;
+  }
+
+  .modal-content,
+  .ready-box {
+    width: calc(100vw - 32px);
+    min-width: 0;
+    max-width: 420px;
+    padding: 22px;
+    border-radius: 12px;
+  }
+
+  .my-profit {
+    font-size: 28px;
+  }
+
+  .final-hand-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .final-hand-info {
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .final-hand-cards {
+    justify-content: flex-start;
+  }
+
+  .community-result-cards {
+    justify-content: flex-start;
+    gap: 4px;
+  }
+
+  .error-toast {
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 700px) and (orientation: landscape) {
+  .game-header {
+    padding: 5px 10px;
+  }
+
+  .player-stats-bar {
+    padding: 3px 10px;
+  }
+
+  .poker-table-container {
+    min-height: 230px;
+  }
+
+  .table-surface {
+    width: min(70vw, 520px);
+    height: min(39vw, 285px);
+    min-height: 210px;
+  }
+
+  .chat-box {
+    display: none;
+  }
 }

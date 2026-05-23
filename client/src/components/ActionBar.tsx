@@ -53,7 +53,7 @@ export function ActionBar({ isMyTurn, phase, myBet, currentBet, myChips, minRais
         <button className="btn-action btn-fold" onClick={() => onAction('fold')}>
           弃牌
         </button>
-        <button className="btn-action btn-allin" onClick={() => onAction('all-in')}>
+        <button className="btn-action btn-allin" onClick={() => onAction('all-in', myChips)}>
           全下 ({myChips})
         </button>
       </div>
@@ -102,7 +102,7 @@ export function ActionBar({ isMyTurn, phase, myBet, currentBet, myChips, minRais
         </button>
       </div>
 
-      <button className="btn-action btn-allin" onClick={() => onAction('all-in')}>
+      <button className="btn-action btn-allin" onClick={() => onAction('all-in', myChips)}>
         全下 ({myChips})
       </button>
     </div>

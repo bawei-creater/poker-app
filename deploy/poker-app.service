@@ -1,0 +1,15 @@
+[Unit]
+Description=Poker App
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/poker-app
+Environment=NODE_ENV=production
+Environment=PORT=3001
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

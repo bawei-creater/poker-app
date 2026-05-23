@@ -11,11 +11,11 @@ interface Props {
 export function PokerTable({ roomState, myPlayerId }: Props) {
   const getSeatPosition = (index: number) => {
     const angle = (2 * Math.PI * index) / 9 - Math.PI / 2;
-    const rx = 360;
-    const ry = 200;
+    const rx = 44;
+    const ry = 43;
     return {
-      left: `calc(50% + ${rx * Math.cos(angle)}px)`,
-      top: `calc(50% + ${ry * Math.sin(angle)}px)`,
+      left: `${50 + rx * Math.cos(angle)}%`,
+      top: `${50 + ry * Math.sin(angle)}%`,
     };
   };
 

@@ -25,17 +25,35 @@ export function registerSocketHandlers(io: TypedServer, roomManager: RoomManager
     });
 
     socket.on('room:join', ({ roomId, playerName }) => {
-      const room = roomManager.getRoom(roomId);
+      const normalizedRoomId = roomId.trim().toUpperCase();
+      const room = roomManager.getRoom(normalizedRoomId);
       if (!room) {
-        socket.emit('room:error', { message: '房间不存在' });
+        socket.emit('room:error', { message: '房间不存在，请检查房间号' });
         return;
+      }
+      const currentRoom = roomManager.findRoomByPlayer(socket.id);
+      if (currentRoom?.id === room.id) {
+        socket.join(room.id);
+        socket.emit('room:joined', { roomId: room.id });
+        broadcastRoomState(io, room, roomManager);
+        return;
+      }
+      if (currentRoom && currentRoom.id !== room.id) {
+        currentRoom.removePlayer(socket.id);
+        socket.leave(currentRoom.id);
+        if (currentRoom.players.length === 0) {
+          roomManager.removeRoom(currentRoom.id);
+        } else {
+          broadcastRoomState(io, currentRoom, roomManager);
+        }
       }
       const player = room.addPlayer(socket.id, playerName);
       if (!player) {
         socket.emit('room:error', { message: '房间已满' });
         return;
       }
-      socket.join(roomId);
+      socket.join(room.id);
+      socket.emit('room:joined', { roomId: room.id });
       broadcastRoomState(io, room, roomManager);
     });
 

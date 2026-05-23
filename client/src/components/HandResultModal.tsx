@@ -1,4 +1,5 @@
 import type { HandResult } from 'shared';
+import { Card } from './Card';
 
 interface Props {
   result: HandResult;
@@ -56,13 +57,31 @@ export function HandResultModal({ result, myPlayerId, onClose, onReady }: Props)
           <div className="final-hands">
             <h3>摊牌手牌</h3>
             {result.finalHands.map((fh, i) => (
-              <div key={i} className="hand-row">
-                <span>
-                  {result.playerProfits.find(p => p.playerId === fh.playerId)?.name ?? fh.playerId.slice(0, 6)}
-                </span>
-                <span>{fh.handName}</span>
+              <div key={i} className="hand-row final-hand-row">
+                <div className="final-hand-info">
+                  <span className="final-hand-name">
+                    {result.playerProfits.find(p => p.playerId === fh.playerId)?.name ?? fh.playerId.slice(0, 6)}
+                  </span>
+                  <span className="final-hand-type">{fh.handName}</span>
+                </div>
+                <div className="final-hand-cards">
+                  {fh.cards.map((card, cardIndex) => (
+                    <Card key={cardIndex} card={card} small />
+                  ))}
+                </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {result.communityCards.length > 0 && (
+          <div className="final-hands community-result">
+            <h3>公共牌</h3>
+            <div className="community-result-cards">
+              {result.communityCards.map((card, i) => (
+                <Card key={i} card={card} small />
+              ))}
+            </div>
           </div>
         )}
 

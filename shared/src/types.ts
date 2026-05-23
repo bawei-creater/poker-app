@@ -60,6 +60,7 @@ export interface GameAction {
 export interface HandResult {
   winners: { playerId: string; handName: string; winnings: number }[];
   pot: number;
+  communityCards: Card[];
   finalHands: { playerId: string; cards: Card[]; handName: string }[];
   playerProfits: { playerId: string; name: string; profit: number }[];
 }
@@ -86,6 +87,7 @@ export interface ClientToServerEvents {
 // Socket events: Server -> Client
 export interface ServerToClientEvents {
   'room:created': (data: { roomId: string }) => void;
+  'room:joined': (data: { roomId: string }) => void;
   'room:error': (data: { message: string }) => void;
   'game:state': (data: RoomState) => void;
   'game:handResult': (data: HandResult) => void;
